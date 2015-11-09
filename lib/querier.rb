@@ -110,8 +110,8 @@ class Querier
   def parse(data)
     data.each do |entry|
       {
-        timestamp: entry["fields"]["@timestamp"][0],
-        user_id: entry["fields"]["user_id"][0]
+        timestamp: entry["fields"]["@timestamp"],
+        user_id: entry["fields"]["user_id"]
       }
     end
   end
