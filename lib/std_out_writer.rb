@@ -9,7 +9,8 @@ class StdOutWriter
     p "============== #{@counter} ==============="
     entries.each do |entry|
       p entry
-      @counter++
+      @counter = @counter + 1
     end
   end
+
 end
