@@ -6,7 +6,6 @@ class StdOutWriter
 
   def write_many(entries)
     # {_id,timestamp,user_id:123}
-    p "============== #{@counter} ==============="
     entries.each do |entry|
       p entry
       @counter = @counter + 1
