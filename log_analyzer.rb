@@ -12,6 +12,9 @@ class LogAnalyzer
   end
 
   def execute
+    start_time = Time.now
     @querier.execute
+    end_time = Time.now
+    p "#{end_time - start_time}s"
   end
 end
