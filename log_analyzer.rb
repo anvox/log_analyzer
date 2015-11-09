@@ -1,3 +1,6 @@
+require 'lib/std_out_writer'
+require 'lib/param_provider'
+require 'lib/querier'
 require 'elasticsearch'
 
 class LogAnalyzer
