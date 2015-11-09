@@ -1,4 +1,3 @@
-require 'lib/*'
 require 'elasticsearch'
 
 class LogAnalyzer
