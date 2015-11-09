@@ -1,4 +1,6 @@
 class ParamProvider
+  def initialize(params)
+  end
   def from
     # Oct 1st, 2015, 00:00:00.001 Z
     Time.new(2015, 10, 1, 0, 0, 0, 0)
