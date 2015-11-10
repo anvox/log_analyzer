@@ -111,10 +111,7 @@ class Querier
     total = sample["hits"]["total"]
     start_from = 0
 
-    wq = WorkQueue.new
-
     while start_from <= total
-      wq.enqueue_b do
         page = @es_client.search(
           index: logstash_index,
           body: query(start_from)
@@ -124,11 +121,8 @@ class Querier
         data = parse(page["hits"]["hits"])
         @writer.write_many(data)
 
-        sleep 20
-      end
+        sleep 30
     end
-
-    wq.join
   end
 
   def parse(data)
