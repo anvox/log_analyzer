@@ -12,8 +12,8 @@ class Querier
   end
 
   def logstash_index
-    from_date = Date.parse(@param_provider.from)
-    to_date = Date.parse(@param_provider.to)
+    from_date = Date.parse(@param_provider.from.to_s)
+    to_date = Date.parse(@param_provider.to.to_s)
     indices = [logstash_index_format(from_date - 1)]
     current_date = from_date
     while current_date <= to_date
