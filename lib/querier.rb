@@ -1,3 +1,5 @@
+require 'work_queue'
+
 class Querier
   PAGE_SIZE = 500
   def initialize(param_provider, writer)
@@ -108,16 +110,25 @@ class Querier
       )
     total = sample["hits"]["total"]
     start_from = 0
-    while start_from <= total
-      page = @es_client.search(
-        index: logstash_index,
-        body: query(start_from)
-        )
-      start_from = start_from + PAGE_SIZE
 
-      data = parse(page["hits"]["hits"])
-      @writer.write_many(data)
+    wq = WorkQueue.new
+
+    while start_from <= total
+      wq.enqueue_b do
+        page = @es_client.search(
+          index: logstash_index,
+          body: query(start_from)
+          )
+        start_from = start_from + PAGE_SIZE
+
+        data = parse(page["hits"]["hits"])
+        @writer.write_many(data)
+
+        sleep 20
+      end
     end
+
+    wq.join
   end
 
   def parse(data)
