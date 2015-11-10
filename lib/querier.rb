@@ -4,11 +4,24 @@ class Querier
     @param_provider = param_provider
     @writer = writer
 
-    @es_client = Elasticsearch::Client.new host: @param_provider.end_point
+    @es_client = Elasticsearch::Client.new host: @param_provider.endpoint
+  end
+
+  def logstash_index_format(date)
+    date.strftime("logstash-%Y.%m.%d")
   end
 
   def logstash_index
-    "logstash-2015.10.31,logstash-2015.10.30,logstash-2015.10.29,logstash-2015.10.28,logstash-2015.10.27,logstash-2015.10.26,logstash-2015.10.25,logstash-2015.10.24,logstash-2015.10.23,logstash-2015.10.22,logstash-2015.10.21,logstash-2015.10.20,logstash-2015.10.19,logstash-2015.10.18,logstash-2015.10.17,logstash-2015.10.16,logstash-2015.10.15,logstash-2015.10.14,logstash-2015.10.13,logstash-2015.10.12,logstash-2015.10.11,logstash-2015.10.10,logstash-2015.10.09,logstash-2015.10.08,logstash-2015.10.07,logstash-2015.10.06,logstash-2015.10.05,logstash-2015.10.04,logstash-2015.10.03,logstash-2015.10.02,logstash-2015.10.01,logstash-2015.09.30"
+    from_date = Date.parse(@param_provider.from)
+    to_date = Date.parse(@param_provider.to)
+    indices = [logstash_index_format(from_date - 1)]
+    current_date = from_date
+    while current_date <= to_date
+      indices << logstash_index_format(current_date)
+      current_date = current_date + 1
+    end
+    indices << logstash_index_format(current_date)
+    indices.join(",")
   end
 
   def query_template(from, to, page_size, start_from)
@@ -44,7 +57,7 @@ class Querier
                         "query": "type:\"rails\" AND tags:(NOT _jsonparsefailure)"
                       }
                     },
-                    "_cache": true
+                    "_cache": false
                   }
                 },
                 {
@@ -54,7 +67,7 @@ class Querier
                         "query": "controller:(NOT app_status)"
                       }
                     },
-                    "_cache": true
+                    "_cache": false
                   }
                 }
               ]
@@ -109,11 +122,16 @@ class Querier
 
   def parse(data)
     data.map do |entry|
+      next if entry["fields"].nil?
+      data = entry["fields"]
+      next if data["@timestamp"].nil?
+      next if data["user_id"].nil?
+
       {
-        timestamp: entry["fields"]["@timestamp"][0],
-        user_id: entry["fields"]["user_id"][0]
+        timestamp: data["@timestamp"][0],
+        user_id: data["user_id"][0]
       }
-    end
+    end.compact
   end
 
 end

@@ -5,8 +5,8 @@ require 'elasticsearch'
 
 class LogAnalyzer
   def initialize(params)
-    @param_provider = ParamProvider.new({})
-    @writer = StdOutWriter.new({session_id: "application_october_analyzing"})
+    @param_provider = ParamProvider.new(params)
+    @writer = StdOutWriter.new(params)
 
     @querier = Querier.new(@param_provider, @writer)
   end
